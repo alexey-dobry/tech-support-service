@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Техподдержка</title>
+</head>
+<body>
+  <h1>Отправить запрос на техподдержку</h1>
+  <!-- атрибут action показывает куда будут обращаться введенные данные-->
+  <form id="bookForm">
+    <label for="title">Введите место где встретилась проблема:</label>
+    <input type="text" id="title" name="title" required><br><br>
+    
+    <label for="description">Введите краткое описание:</label>
+    <input type="text" id="description" name="description" required><br><br>
+    
+    <input type="submit" value="Отправить жалобу">
+  </form>
+
+  <script>
+    document.getElementById('bookForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // предотвращает перезагрузку страницы
+        
+        // Формируем данные формы для отправки
+        const formData = new FormData(event.target);
+        const data = new URLSearchParams();
+        for (const pair of formData) {
+            data.append(pair[0], pair[1]);
+        }
+
+        // Отправляем данные через fetch
+        fetch('http://localhost:8000/api/requests', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: data.toString(),
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log('Success:', result);
+            alert("Запрос добавлен!");
+            event.target.reset(); // Очистка формы после успешной отправки
+        })
+        //.catch(error => {
+        //    console.error('Error:', error);
+        //    alert("Ошибка при добавлении книги.");
+        //});
+    });
+  </script>
+</body>
+</html>

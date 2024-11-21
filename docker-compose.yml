@@ -1,0 +1,42 @@
+services:
+  httpd:
+    image: httpd:latest
+    container_name: apache_server
+    ports:
+      - "80:80"
+    volumes:
+      - ./html:/usr/local/apache2/htdocs
+    networks:
+      - app-network
+  
+  database:
+    image: mysql:8.0.40-debian
+    container_name: tech-sup-db
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+    environment:
+      MYSQL_DATABASE: mydatabase
+      MYSQL_ROOT_PASSWORD: mypassword
+      MYSQL_PASSWORD: mypassword
+      MYSQL_USER: myuser
+    volumes:
+      - database:/var/lib/mysql
+  
+  server:
+    image: tech-support-app-server:latest
+    container_name: tech-sup-server
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+    depends_on:
+      - database
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  database:
