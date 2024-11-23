@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"log"
+	"os"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -42,5 +43,22 @@ func NewMySQL() (*sql.DB, error) {
 	} else {
 		log.Println("Connection is good")
 	}
+
+	sqlFile := "../init.sql"
+
+	script, err := os.ReadFile(sqlFile)
+
+	if err != nil {
+		log.Fatalf("Unable to read sql init script file: %s", err)
+	}
+
+	commands := string(script)
+
+	_, err = db.Exec(commands)
+
+	if err != nil {
+		log.Fatalf("Unable to execute sql init script: %s", err)
+	}
+
 	return db, nil
 }
