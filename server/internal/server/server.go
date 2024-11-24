@@ -19,6 +19,8 @@ func New(dataBase *sql.DB) *Server {
 		database: dataBase,
 	}
 
+	s.initRoutes()
+
 	log.Println("Server instance created")
 	return &s
 }

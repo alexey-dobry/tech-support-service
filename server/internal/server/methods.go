@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -36,7 +37,9 @@ func (s *Server) handleGetRequests() http.HandlerFunc {
 
 func (s *Server) handleCreateRequest() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Adding new element to database")
 
+		w.Header().Set("Content-Type", "application/json")
 		err := r.ParseForm()
 		if err != nil {
 			http.Error(w, "Ivalid form data", http.StatusBadRequest)
@@ -59,6 +62,10 @@ func (s *Server) handleCreateRequest() http.HandlerFunc {
 			http.Error(w, "Failed to insert data into database", http.StatusInternalServerError)
 			log.Println("Insert error:", err)
 			return
+		} else {
+			log.Println("New element added to database")
 		}
+
+		json.NewEncoder(w).Encode(map[string]string{"status": "Request added successfully"})
 	}
 }

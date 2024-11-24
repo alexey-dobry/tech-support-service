@@ -2,15 +2,20 @@ package main
 
 import (
 	"log"
+	"tech-support-platform/internal/app"
 	"tech-support-platform/internal/db"
-	"tech-support-platform/internal/server"
 )
 
 func main() {
-	Database, _ := db.NewMySQL()
 
-	App := server.New(Database)
+	Database, err := db.NewMySQL()
+	if err != nil {
+		log.Fatal("Error creating database")
+	}
+	defer Database.Close()
+
+	App := app.New(Database)
 
 	App.Run()
-	log.Println("Server is running...")
+
 }
