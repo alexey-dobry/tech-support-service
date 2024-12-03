@@ -2,8 +2,9 @@ package main
 
 import (
 	"log"
-	"tech-support-platform/internal/app"
-	"tech-support-platform/internal/db"
+
+	"github.com/alexey-dobry/tech-support-platform/internal/services/req_user_service/internal/app"
+	"github.com/alexey-dobry/tech-support-platform/internal/services/req_user_service/internal/db"
 )
 
 func main() {

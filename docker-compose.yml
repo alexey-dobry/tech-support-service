@@ -23,7 +23,7 @@ services:
       MYSQL_USER: myuser
     volumes:
       - database:/var/lib/mysql
-      - ./databases_init:/docker-entrypoint-initdb.d/:ro
+      - ./migrations:/docker-entrypoint-initdb.d/:ro
   
   server:
     image: tech-sup-server:latest

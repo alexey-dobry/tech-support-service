@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"log"
 
-	"tech-support-platform/internal/server"
+	"github.com/alexey-dobry/tech-support-platform/internal/services/req_user_service/internal/server"
 )
 
 type App struct {
