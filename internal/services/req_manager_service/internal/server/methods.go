@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"tech-support-platform/internal/models"
+	"github.com/alexey-dobry/tech-support-platform/internal/pkg/models"
 )
 
 func (s *Server) handleGetRequests() http.HandlerFunc {
