@@ -24,7 +24,7 @@ type bot struct {
 func New(cfg *config.Config) Bot {
 	var b bot
 	client, err := telebot.NewBot(telebot.Settings{
-		Token:  "8114672135:AAGX6_mJ_idUcVoxA9Vb_nDhY2BVlyOVD9U", // Замените на токен вашего бота
+		Token:  cfg.Bot.Tocken, // Замените на токен вашего бота
 		Poller: &telebot.LongPoller{Timeout: 10 * time.Second},
 	})
 

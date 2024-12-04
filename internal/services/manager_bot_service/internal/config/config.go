@@ -16,20 +16,16 @@ type BotConfig struct {
 	Language string `validate:"required" mapstructure:"language"`
 }
 
-func init() {
-	viper.SetEnvPrefix("MBOX")
+func (cfg *Config) InitBotConfig() {
 
-	viper.BindEnv("bot.token")
-	log.Print(Get().Bot.Tocken)
-	viper.SetDefault("bot.language", "ru-RU")
-
-	viper.SetDefault("managerclient.target", "localhost:50051")
-
-	viper.SetDefault("pmclient.target", "localhost:50052")
+	cfg.Bot.Tocken = viper.GetString("bot.tocken")
+	cfg.Bot.Language = viper.GetString("bot.language")
 }
 
 func Get() Config {
 	cfg := Config{}
+
+	cfg.InitBotConfig()
 
 	if err := viper.Unmarshal(&cfg); err != nil {
 		log.Fatalf("Config Unmarshal error: %s", err)
