@@ -14,12 +14,14 @@ type Config struct {
 type BotConfig struct {
 	Tocken   string `validate:"required" mapstructure:"token"`
 	Language string `validate:"required" mapstructure:"language"`
+	AuthURL  string `validate:"required" mapstructure:"authurl"`
 }
 
 func (cfg *Config) InitBotConfig() {
 
 	cfg.Bot.Tocken = viper.GetString("bot.tocken")
 	cfg.Bot.Language = viper.GetString("bot.language")
+	cfg.Bot.AuthURL = viper.GetString("bot.authservurl")
 }
 
 func Get() Config {

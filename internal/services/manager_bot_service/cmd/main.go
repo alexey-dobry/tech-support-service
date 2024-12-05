@@ -12,7 +12,7 @@ func main() {
 	log.Print("Building manager_bot_service...")
 
 	cfg := config.Get()
-	log.Print(cfg.Bot.Tocken)
+
 	log.Print("Config read succesfully")
 
 	bot := bot.New(&cfg)
