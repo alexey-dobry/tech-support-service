@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/alexey-dobry/tech-support-platform/internal/services/manager_bot_service/internal/session"
 	"gopkg.in/telebot.v4"
 )
 
@@ -22,11 +23,11 @@ func (b *bot) HandleSendMsg() telebot.HandlerFunc {
 		}
 		message := strings.Join(args[1:], " ")
 
-		if c.Sender().ID != managerID {
+		if !session.IsAuthorized(c.Sender().ID) {
 			return c.Send("У вас недостаточно прав доступа")
 		}
 
-		// Получить ID клиента
+		// Получить чат по ID клиента
 		clientChat := telebot.ChatID(clientID)
 
 		// Ответить клиенту

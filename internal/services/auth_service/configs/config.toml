@@ -1,5 +1,5 @@
 [database]
-dsn = "myuser:mypassword@tcp(docker.for.mac.localhost:3306)/mydatabase"
+dsn = "root:mypassword@tcp(localhost:3307)/managerdb"
 
 [server]
 adress = ":8080"
