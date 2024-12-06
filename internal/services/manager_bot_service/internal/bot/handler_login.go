@@ -1,7 +1,7 @@
 package bot
 
 import (
-	auth "github.com/alexey-dobry/tech-support-platform/internal/services/manager_bot_service/internal/bot/Middleware"
+	middleware "github.com/alexey-dobry/tech-support-platform/internal/services/manager_bot_service/internal/bot/Middleware"
 	"github.com/alexey-dobry/tech-support-platform/internal/services/manager_bot_service/internal/session"
 	"gopkg.in/telebot.v4"
 )
@@ -17,7 +17,7 @@ func (b *bot) HandleAuth() telebot.HandlerFunc {
 		password := args[1]
 
 		// Отправляем запрос к микросервису
-		if auth.Authenticate(login, password) {
+		if middleware.Authenticate(login, password) {
 			managerID := c.Sender().ID
 			session.AuthorizeManager(managerID)
 			return c.Send("Авторизация успешна! Теперь вы можете отвечать клиентам.")

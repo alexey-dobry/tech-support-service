@@ -47,8 +47,11 @@ func (b *bot) initHandlers() {
 	// Менеджер отвечает клиенту
 	b.client.Handle("/reply", b.HandleSendMsg())
 
-	// Вход в систему менеджером
+	// Вход в систему(для менеджера)
 	b.client.Handle("/login", b.HandleAuth())
+
+	// Выход из системы(для менеджера)
+	b.client.Handle("/logout", b.HandleLogut())
 }
 
 // Запуск бота

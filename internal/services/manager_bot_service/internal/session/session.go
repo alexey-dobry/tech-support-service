@@ -35,6 +35,11 @@ func AuthorizeManager(managerID int64) {
 	session.Authorized = true
 }
 
+func DeauthorizeManager(managerID int64) {
+	session := GetSession(managerID)
+	session.Authorized = false
+}
+
 func IsAuthorized(managerID int64) bool {
 	session := GetSession(managerID)
 	return session.Authorized
