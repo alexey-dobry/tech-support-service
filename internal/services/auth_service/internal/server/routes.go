@@ -8,7 +8,7 @@ func (s *Server) initRoutes() {
 	}
 
 	s.router.POST("/auth", s.handleGetLoginData())
-	s.router.GET("/reg", s.handlePostLoginData())
+	s.router.POST("/reg", s.handlePostLoginData())
 
 	log.Print("server routes was initialized")
 }

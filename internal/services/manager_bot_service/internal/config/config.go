@@ -18,10 +18,9 @@ type BotConfig struct {
 }
 
 func (cfg *Config) InitBotConfig() {
-
 	cfg.Bot.Tocken = viper.GetString("bot.tocken")
 	cfg.Bot.Language = viper.GetString("bot.language")
-	cfg.Bot.AuthURL = viper.GetString("bot.authservurl")
+	cfg.Bot.AuthURL = viper.GetString("bot.url")
 }
 
 func Get() Config {

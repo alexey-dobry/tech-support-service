@@ -1,19 +1,9 @@
 services:
-  httpd:
-    image: httpd:latest
-    container_name: apache_server
-    ports:
-      - "80:80"
-    volumes:
-      - ./html:/usr/local/apache2/htdocs
-    networks:
-      - app-network
-  
-  database:
+  manager:
     image: mysql:9.1.0
-    container_name: tech-sup-db
+    container_name: managersdb
     ports:
-      - "3306:3306"
+      - "3307:3306"
     networks:
       - app-network
     environment:
@@ -22,22 +12,12 @@ services:
       MYSQL_PASSWORD: mypassword
       MYSQL_USER: myuser
     volumes:
-      - database:/var/lib/mysql
+      - manager:/var/lib/mysql
       - ./migrations:/docker-entrypoint-initdb.d/:ro
-  
-  server:
-    image: tech-sup-server:latest
-    container_name: tech-sup-server
-    ports:
-      - "8000:8000"
-    networks:
-      - app-network
-    depends_on:
-      - database
 
 networks:
   app-network:
     driver: bridge
 
 volumes:
-  database:
+  manager:

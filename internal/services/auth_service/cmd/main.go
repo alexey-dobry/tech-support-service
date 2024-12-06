@@ -16,6 +16,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Error creating database")
 	}
+	defer Database.Close()
 
 	App := app.New(Database)
 

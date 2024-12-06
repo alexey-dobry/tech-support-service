@@ -38,7 +38,7 @@ func NewMySQL(cfg *config.Config) (*sql.DB, error) {
 	err = db.Ping()
 	log.Println("Testing the connection")
 	if err != nil {
-		log.Fatalf("Bad connection: %s", err)
+		log.Fatalf("Bad connection: %s; dsn: %s", err, dsn)
 	} else {
 		log.Println("Connection is good")
 	}

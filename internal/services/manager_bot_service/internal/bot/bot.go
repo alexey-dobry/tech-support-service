@@ -8,10 +8,6 @@ import (
 	"gopkg.in/telebot.v4"
 )
 
-var (
-	managerID int64 = 549938415 // Замените на Telegram ID менеджера
-)
-
 type Bot interface {
 	Run()
 }
@@ -24,7 +20,7 @@ type bot struct {
 func New(cfg *config.Config) Bot {
 	var b bot
 	client, err := telebot.NewBot(telebot.Settings{
-		Token:  cfg.Bot.Tocken, // Замените на токен вашего бота
+		Token:  cfg.Bot.Tocken,
 		Poller: &telebot.LongPoller{Timeout: 10 * time.Second},
 	})
 
@@ -50,6 +46,9 @@ func (b *bot) initHandlers() {
 
 	// Менеджер отвечает клиенту
 	b.client.Handle("/reply", b.HandleSendMsg())
+
+	// Вход в систему менеджером
+	b.client.Handle("/login", b.HandleAuth())
 }
 
 // Запуск бота

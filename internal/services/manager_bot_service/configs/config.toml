@@ -1,4 +1,4 @@
 [bot]
-tocken = "8114672135:AAGX6_mJ_idUcVoxA9Vb_nDhY2BVlyOVD9U"
+tocken = "your_tocken"
 language = "ru-RU"
-authservurl = "http://localhost:8080/auth"
+url = "http://localhost:8080/auth"
