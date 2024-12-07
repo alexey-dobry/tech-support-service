@@ -44,24 +44,3 @@ func (s *Server) handleGetLoginData() gin.HandlerFunc {
 		}
 	}
 }
-
-func (s *Server) handlePostLoginData() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		DataFromBot := models.LoginData{}
-		if err := c.BindJSON(&DataFromBot); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
-			return
-		}
-
-		query := "INSERT INTO requests (username, password) VALUES (?, ?)"
-		_, err := s.database.Exec(query, DataFromBot.Username, DataFromBot.Password)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Error adding user data to database"})
-			log.Println("Insert error:", err)
-			return
-		} else {
-			log.Print("Successfully added new user to the database")
-			c.JSON(http.StatusOK, gin.H{"status": "success"})
-		}
-	}
-}

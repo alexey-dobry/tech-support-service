@@ -16,6 +16,10 @@ func (b *bot) HandleAuth() telebot.HandlerFunc {
 		login := args[0]
 		password := args[1]
 
+		if session.IsAuthorized(managerID) != false {
+			return c.Send("Вы уже вошли в аккаунт")
+		}
+
 		// Отправляем запрос к микросервису
 		if middleware.Authenticate(login, password) {
 			managerID := c.Sender().ID

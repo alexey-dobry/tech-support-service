@@ -1,71 +1,72 @@
 package server
 
 import (
-	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/alexey-dobry/tech-support-platform/internal/pkg/models"
+	"github.com/gin-gonic/gin"
 )
 
-func (s *Server) handleGetRequests() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		requests := make([]models.Request, 0)
+func (s *Server) handleGetSession() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		DataFromBot := models.Session{}
+		if err := c.BindJSON(&DataFromBot); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+			log.Println("error: Could not bind json")
+			return
+		}
 
-		query := "SELECT * FROM Requests"
+		query := "SELECT * FROM sessions WHERE clientid=0"
 
-		rows, err := s.database.Query(query)
+		data, err := s.database.Query(query)
 		if err != nil {
-			http.Error(w, "Failed to retrieve data from database", http.StatusInternalServerError)
-			log.Println("Retrieveing error:", err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Error retreaving data from database"})
+			log.Printf("error: could not querry data from database, errormsg: %s", err)
+			return
 		}
 
-		for rows.Next() {
-			request := models.Request{}
+		DataFromDB := models.Session{}
 
-			err := rows.Scan(&request.ID, &request.Title, &request.Description,
-				&request.Status)
-
-			if err != nil {
-				log.Fatal("Error getting the data from database row: ", err)
-			}
-
-			requests = append(requests, request)
+		data.Next()
+		err = data.Scan(&DataFromDB.ManagerID, &DataFromDB.ClientID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Error decoding data from DB"})
+			log.Printf("error: %s", err)
+			return
 		}
+
+		query = fmt.Sprintf("UPDATE sessions SET clientid = '%d' WHERE managerid='%d'", DataFromBot.ClientID, DataFromDB.ManagerID)
+
+		_, err = s.database.Exec(query)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Error writing data to database"})
+			return
+		} else {
+			c.JSON(http.StatusOK, gin.H{"status": "success"})
+		}
+
 	}
 }
 
-func (s *Server) handleCreateRequest() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Adding new element to database")
-
-		w.Header().Set("Content-Type", "application/json")
-		err := r.ParseForm()
-		if err != nil {
-			http.Error(w, "Ivalid form data", http.StatusBadRequest)
+func (s *Server) handleCreateSession() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		DataFromBot := models.Session{}
+		if err := c.BindJSON(&DataFromBot); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 			return
 		}
 
-		title := r.FormValue("title")
-		description := r.FormValue("description")
-
-		if title == "" || description == "" {
-			http.Error(w, "Missiong form fields", http.StatusBadRequest)
-			return
-		}
-
-		status := 0
-
-		query := "INSERT INTO requests (title, description, status) VALUES (?, ?, ?)"
-		_, err = s.database.Exec(query, title, description, status)
+		query := "INSERT INTO requests (username, password) VALUES (?, ?)"
+		_, err := s.database.Exec(query, DataFromBot.ManagerID, 0)
 		if err != nil {
-			http.Error(w, "Failed to insert data into database", http.StatusInternalServerError)
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Error adding session data to database"})
 			log.Println("Insert error:", err)
 			return
 		} else {
-			log.Println("New element added to database")
+			log.Print("Successfully created new session")
+			c.JSON(http.StatusOK, gin.H{"status": "success"})
 		}
-
-		json.NewEncoder(w).Encode(map[string]string{"status": "Request added successfully"})
 	}
 }

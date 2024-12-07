@@ -3,19 +3,19 @@ package server
 import (
 	"database/sql"
 	"log"
-	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/alexey-dobry/tech-support-platform/internal/services/req_user_service/internal/config"
+	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
-	router   *mux.Router
+	router   *gin.Engine
 	database *sql.DB
 }
 
 func New(dataBase *sql.DB) *Server {
 	s := Server{
-		router:   mux.NewRouter(),
+		router:   gin.Default(),
 		database: dataBase,
 	}
 
@@ -25,6 +25,6 @@ func New(dataBase *sql.DB) *Server {
 	return &s
 }
 
-func (s *Server) Run() {
-	log.Fatal(http.ListenAndServe(":8000", s.router))
+func (s *Server) Run(cfg *config.Config) {
+	log.Fatal(s.router.Run(cfg.AuthServer.ServerAdress))
 }

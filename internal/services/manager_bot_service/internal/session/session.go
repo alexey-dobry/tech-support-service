@@ -16,7 +16,10 @@ func GetSession(managerID int64) *ManagerSession {
 	if exists {
 		return session.(*ManagerSession)
 	}
+	return nil
+}
 
+func CreateSession(managerID int64) *ManagerSession {
 	newSession := &ManagerSession{
 		Authorized:   false,
 		ActiveClient: 0,
@@ -42,5 +45,8 @@ func DeauthorizeManager(managerID int64) {
 
 func IsAuthorized(managerID int64) bool {
 	session := GetSession(managerID)
-	return session.Authorized
+	if session != nil {
+		return session.Authorized
+	}
+	return false
 }

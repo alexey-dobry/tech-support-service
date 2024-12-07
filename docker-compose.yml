@@ -4,8 +4,6 @@ services:
     container_name: managersdb
     ports:
       - "3307:3306"
-    networks:
-      - app-network
     environment:
       MYSQL_DATABASE: mydatabase
       MYSQL_ROOT_PASSWORD: mypassword
@@ -13,11 +11,23 @@ services:
       MYSQL_USER: myuser
     volumes:
       - manager:/var/lib/mysql
-      - ./migrations:/docker-entrypoint-initdb.d/:ro
+      - ./migrations/auth:/docker-entrypoint-initdb.d/:ro
+  
+  session:
+    image: mysql:9.1.0
+    container_name: sessionsdb
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_DATABASE: mydatabase
+      MYSQL_ROOT_PASSWORD: mypassword
+      MYSQL_PASSWORD: mypassword
+      MYSQL_USER: myuser
+    volumes:
+      - session:/var/lib/mysql
+      - ./migrations/session:/docker-entrypoint-initdb.d/:ro
 
-networks:
-  app-network:
-    driver: bridge
 
 volumes:
   manager:
+  session:

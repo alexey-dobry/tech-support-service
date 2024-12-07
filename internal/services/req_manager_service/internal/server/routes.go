@@ -4,11 +4,11 @@ import "log"
 
 func (s *Server) initRoutes() {
 	if s.router == nil {
-		log.Fatal("routes init error: router isn't initialized")
+		log.Fatal("Server router is not initialized")
 	}
 
-	s.router.HandleFunc("/api/request", s.handleGetRequests()).Methods("GET")
-	s.router.HandleFunc("/api/requests", s.handleCreateRequest()).Methods("POST")
+	s.router.POST("/session", s.handleGetSession())
+	s.router.POST("/create_session", s.handleCreateSession())
 
-	log.Println("Server routes was initialized")
+	log.Print("server routes was initialized")
 }

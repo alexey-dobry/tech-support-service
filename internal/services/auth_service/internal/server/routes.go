@@ -8,7 +8,6 @@ func (s *Server) initRoutes() {
 	}
 
 	s.router.POST("/auth", s.handleGetLoginData())
-	s.router.POST("/reg", s.handlePostLoginData())
 
 	log.Print("server routes was initialized")
 }

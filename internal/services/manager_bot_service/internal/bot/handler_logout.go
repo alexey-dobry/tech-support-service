@@ -17,9 +17,9 @@ func (b *bot) HandleLogut() telebot.HandlerFunc {
 
 		if session.IsAuthorized(senderId) {
 			session.DeauthorizeManager(senderId)
+			return c.Send("Вы вышли из аккаунта")
 		} else {
 			return c.Send("Вы не вошли в аккаунт")
 		}
-		return nil
 	}
 }
