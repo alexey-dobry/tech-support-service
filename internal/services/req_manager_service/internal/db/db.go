@@ -5,11 +5,12 @@ import (
 	"log"
 	"time"
 
+	"github.com/alexey-dobry/tech-support-platform/internal/services/req_user_service/internal/config"
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func NewMySQL() (*sql.DB, error) {
-	dsn := "myuser:mypassword@tcp(docker.for.mac.localhost:3306)/mydatabase"
+func NewMySQL(cfg *config.Config) (*sql.DB, error) {
+	dsn := cfg.AuthServer.MySqlDsn
 
 	var db *sql.DB
 	var err error
@@ -37,7 +38,7 @@ func NewMySQL() (*sql.DB, error) {
 	err = db.Ping()
 	log.Println("Testing the connection")
 	if err != nil {
-		log.Fatalf("Bad connection: %s", err)
+		log.Fatalf("Bad connection: %s; dsn: %s", err, dsn)
 	} else {
 		log.Println("Connection is good")
 	}

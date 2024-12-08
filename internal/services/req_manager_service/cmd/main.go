@@ -4,12 +4,15 @@ import (
 	"log"
 
 	"github.com/alexey-dobry/tech-support-platform/internal/services/req_user_service/internal/app"
+	"github.com/alexey-dobry/tech-support-platform/internal/services/req_user_service/internal/config"
 	"github.com/alexey-dobry/tech-support-platform/internal/services/req_user_service/internal/db"
 )
 
 func main() {
 
-	Database, err := db.NewMySQL()
+	cfg := config.Get()
+
+	Database, err := db.NewMySQL(&cfg)
 	if err != nil {
 		log.Fatal("Error creating database")
 	}
@@ -17,6 +20,5 @@ func main() {
 
 	App := app.New(Database)
 
-	App.Run()
-
+	App.Run(&cfg)
 }

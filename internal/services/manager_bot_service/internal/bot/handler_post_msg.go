@@ -2,8 +2,6 @@ package bot
 
 import (
 	"log"
-	"strconv"
-	"strings"
 
 	"github.com/alexey-dobry/tech-support-platform/internal/services/manager_bot_service/internal/session"
 	"gopkg.in/telebot.v4"
@@ -11,31 +9,26 @@ import (
 
 func (b *bot) HandleSendMsg() telebot.HandlerFunc {
 	return func(c telebot.Context) error {
-		args := c.Args()
+		senderID := c.Sender().ID
 
-		if len(args) < 2 {
-			log.Print("Для отправки ответа введите комманду вида: /reply <user_id> <message>")
-		}
-
-		clientID, err := strconv.ParseInt(args[0], 10, 64)
+		// Проверяем, является ли отправитель менеджером
+		managerClientID, err := session.GetActiveClientForManager(senderID)
 		if err != nil {
-			return c.Send("ID должен быть числом")
-		}
-		message := strings.Join(args[1:], " ")
-
-		if !session.IsAuthorized(c.Sender().ID) {
-			return c.Send("У вас недостаточно прав доступа")
+			return c.Send("У вас нет активной сессии.")
 		}
 
-		// Получить чат по ID клиента
-		clientChat := telebot.ChatID(clientID)
+		if managerClientID == 0 {
+			return c.Send("Нет активных клиентов для ответа.")
+		}
 
-		// Ответить клиенту
-		_, err = b.client.Send(clientChat, "Ответ от менеджера: "+message)
+		// Пересылаем сообщение клиенту
+		clientChat := telebot.ChatID(managerClientID)
+		err = c.Send(clientChat, c.Text())
 		if err != nil {
-			log.Printf("Error sending message from manager to client: %s", err)
-			return c.Send("Ошибка при отправке сообщения клиенту")
+			log.Println("Ошибка отправки клиенту:", err)
+			return c.Send("Не удалось доставить сообщение клиенту.")
 		}
-		return err
+
+		return c.Send("Ваше сообщение отправлено клиенту.")
 	}
 }
