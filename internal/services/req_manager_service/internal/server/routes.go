@@ -7,8 +7,11 @@ func (s *Server) initRoutes() {
 		log.Fatal("Server router is not initialized")
 	}
 
-	s.router.POST("/session", s.handleGetSession())
-	s.router.POST("/create_session", s.handleCreateSession())
+	s.router.POST("/create", s.handleAddNewManager())
+	s.router.POST("/assign", s.handleAssingnManager())
+	s.router.POST("/end", s.handleEndSession())
+	s.router.GET("/sessions/manager/:manager_id", s.handleGetManagerData())
+	s.router.GET("/sessions/manager/:client_id", s.handleGetClientData())
 
 	log.Print("server routes was initialized")
 }
