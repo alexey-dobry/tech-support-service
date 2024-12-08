@@ -23,7 +23,7 @@ func (b *bot) HandleAuth() telebot.HandlerFunc {
 		// Отправляем запрос к микросервису
 		if middleware.Authenticate(login, password) {
 			managerID := c.Sender().ID
-			session.AuthorizeManager(managerID)
+			session.AddNewManager(managerID)
 			return c.Send("Авторизация успешна! Теперь вы можете отвечать клиентам.")
 		}
 

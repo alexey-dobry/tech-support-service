@@ -45,7 +45,7 @@ func (b *bot) initHandlers() {
 	b.client.Handle(telebot.OnText, b.HandleGetMsg())
 
 	// Менеджер отвечает клиенту
-	b.client.Handle("/reply", b.HandleSendMsg())
+	b.client.Handle(telebot.OnText, b.HandleSendMsg())
 
 	// Вход в систему(для менеджера)
 	b.client.Handle("/login", b.HandleAuth())

@@ -13,9 +13,9 @@ func (s *Server) handleGetClientData() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ClientID := c.Param("client_id")
 
-		var activeSession *models.Manager
+		var activeSession models.Manager
 
-		query := fmt.Sprintf("SELECT * FROM sessions WHERE client_id='%s'", ClientID)
+		query := fmt.Sprintf("SELECT * FROM sessions WHERE client_id=%s", ClientID)
 
 		data, err := s.database.Query(query)
 		if err != nil {
@@ -39,9 +39,9 @@ func (s *Server) handleGetManagerData() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		managerID := c.Param("manager_id")
 
-		var activeSession *models.Manager
+		var activeSession models.Manager
 
-		query := fmt.Sprintf("SELECT * FROM sessions WHERE manager_id='%s'", managerID)
+		query := fmt.Sprintf("SELECT * FROM sessions WHERE manager_id=%s", managerID)
 
 		data, err := s.database.Query(query)
 		if err != nil {
@@ -67,7 +67,7 @@ func (s *Server) handleGetManagerData() gin.HandlerFunc {
 
 func (s *Server) handleAddNewManager() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var manager models.Manager
+		var manager models.EndRequest
 		if err := c.BindJSON(&manager); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 			return
@@ -75,7 +75,7 @@ func (s *Server) handleAddNewManager() gin.HandlerFunc {
 
 		query := "INSERT INTO sessions (manager_id, is_free, client_id) VALUES ( ?, ?, ?)"
 
-		_, err := s.database.Exec(query, manager.ManagerID, manager.IsFree, manager.ClientID)
+		_, err := s.database.Exec(query, manager.ManagerID, true, 0)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Error writing data to database"})
 			return
@@ -108,25 +108,24 @@ func (s *Server) handleAssingnManager() gin.HandlerFunc {
 		data.Next()
 		err = data.Scan(&DataFromDB.ManagerID, &DataFromDB.IsFree, &DataFromDB.ClientID)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Error decoding data from DB"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Error decoding data from database"})
 			log.Printf("error: %s", err)
 			return
 		}
 
-		query = fmt.Sprintf("UPDATE sessions SET client_id = '%d' WHERE manager_id='%d'", DataFromBot.ClientID, DataFromDB.ManagerID)
+		query = fmt.Sprintf("UPDATE sessions SET client_id = '%d' WHERE manager_id=%d", DataFromBot.ClientID, DataFromDB.ManagerID)
 
 		_, err = s.database.Exec(query)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Error writing data to database"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Error executing command"})
 			return
 		} else {
 			c.JSON(http.StatusOK, DataFromDB.ManagerID)
 		}
-
 	}
 }
 
-func (s *Server) handleEndSession() gin.HandlerFunc {
+func (s *Server) handleFreeManager() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		DataFromBot := models.EndRequest{}
 		if err := c.BindJSON(&DataFromBot); err != nil {
@@ -134,15 +133,33 @@ func (s *Server) handleEndSession() gin.HandlerFunc {
 			return
 		}
 
-		query := fmt.Sprintf("UPDATE sessions SET is_free = true, client_id=0 WHERE manager_id='%d'", DataFromBot.ManagerID)
+		query := fmt.Sprintf("UPDATE sessions SET is_free = true, client_id=0 WHERE manager_id=%d", DataFromBot.ManagerID)
 
 		_, err := s.database.Exec(query)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Error adding session data to database"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Error executing command"})
 			log.Println("Insert error:", err)
 			return
 		} else {
-			log.Print("Successfully created new session")
+			log.Print("Successfully freed manager")
+			c.JSON(http.StatusOK, gin.H{"status": "success"})
+		}
+	}
+}
+
+func (s *Server) handleEndSession() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		managerID := c.Param("manager_id")
+
+		query := fmt.Sprintf("DELETE FROM sessions WHERE manager_id=%s", managerID)
+
+		_, err := s.database.Exec(query)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Error executing command"})
+			log.Println("Insert error:", err)
+			return
+		} else {
+			log.Print("Successfully deleted session")
 			c.JSON(http.StatusOK, gin.H{"status": "success"})
 		}
 	}
