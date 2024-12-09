@@ -52,14 +52,11 @@ func (s *Server) handleGetManagerData() gin.HandlerFunc {
 			data.Next()
 			err := data.Scan(&activeSession.ManagerID, &activeSession.IsFree, &activeSession.ClientID)
 			if err != nil {
+				log.Print("error1")
 				c.JSON(http.StatusBadRequest, gin.H{"error": "Error retreaving data from database"})
-				return
+
 			} else {
-				if activeSession.ClientID == 0 {
-					c.JSON(http.StatusBadRequest, gin.H{"error": "Error retreaving data from database"})
-				} else {
-					c.JSON(http.StatusOK, activeSession.ClientID)
-				}
+				c.JSON(http.StatusOK, activeSession.ClientID)
 			}
 		}
 	}
@@ -94,31 +91,30 @@ func (s *Server) handleAssingnManager() gin.HandlerFunc {
 			return
 		}
 
-		query := "SELECT * FROM sessions WHERE is_free='true'"
+		query := "SELECT * FROM sessions WHERE is_free=1"
 
-		data, err := s.database.Query(query)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Error retreaving data from database"})
-			log.Printf("error: could not querry data from database, errormsg: %s", err)
-			return
-		}
+		data := s.database.QueryRow(query)
+		// if err != nil {
+		// 	c.JSON(http.StatusBadRequest, gin.H{"error": "Error retreaving data from database"})
+		// 	log.Printf("error: could not querry data from database, errormsg: %s", err)
+		// 	return
+		// }
 
 		DataFromDB := models.Manager{}
 
-		data.Next()
-		err = data.Scan(&DataFromDB.ManagerID, &DataFromDB.IsFree, &DataFromDB.ClientID)
+		err := data.Scan(&DataFromDB.ManagerID, &DataFromDB.IsFree, &DataFromDB.ClientID)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Error decoding data from database"})
-			log.Printf("error: %s", err)
+			log.Printf("error scanning data: %s", err)
 			return
 		}
 
-		query = fmt.Sprintf("UPDATE sessions SET client_id = '%d' WHERE manager_id=%d", DataFromBot.ClientID, DataFromDB.ManagerID)
+		query = fmt.Sprintf("UPDATE sessions SET is_free=0,client_id=%d WHERE manager_id=%d", DataFromBot.ClientID, DataFromDB.ManagerID)
 
 		_, err = s.database.Exec(query)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Error executing command"})
-			return
+			log.Printf("error executiong command: %s", err)
 		} else {
 			c.JSON(http.StatusOK, DataFromDB.ManagerID)
 		}
@@ -133,7 +129,7 @@ func (s *Server) handleFreeManager() gin.HandlerFunc {
 			return
 		}
 
-		query := fmt.Sprintf("UPDATE sessions SET is_free = true, client_id=0 WHERE manager_id=%d", DataFromBot.ManagerID)
+		query := fmt.Sprintf("UPDATE sessions SET is_free = TRUE, client_id=0 WHERE manager_id=%d", DataFromBot.ManagerID)
 
 		_, err := s.database.Exec(query)
 		if err != nil {

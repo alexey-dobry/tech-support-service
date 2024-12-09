@@ -2,6 +2,7 @@ package bot
 
 import (
 	"log"
+	"strings"
 
 	"github.com/alexey-dobry/tech-support-platform/internal/services/manager_bot_service/internal/session"
 	"gopkg.in/telebot.v4"
@@ -10,6 +11,11 @@ import (
 func (b *bot) HandleSendMsg() telebot.HandlerFunc {
 	return func(c telebot.Context) error {
 		senderID := c.Sender().ID
+
+		args := c.Args()
+		if len(args) == 1 {
+			return c.Send("Используйте команду: /reply <сообщение>")
+		}
 
 		// Проверяем, является ли отправитель менеджером
 		managerClientID, err := session.GetActiveClientForManager(senderID)
@@ -23,7 +29,8 @@ func (b *bot) HandleSendMsg() telebot.HandlerFunc {
 
 		// Пересылаем сообщение клиенту
 		clientChat := telebot.ChatID(managerClientID)
-		err = c.Send(clientChat, c.Text())
+		msg := strings.Join(args[:], " ")
+		_, err = b.client.Send(clientChat, msg)
 		if err != nil {
 			log.Println("Ошибка отправки клиенту:", err)
 			return c.Send("Не удалось доставить сообщение клиенту.")

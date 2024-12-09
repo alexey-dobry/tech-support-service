@@ -30,7 +30,8 @@ func (b *bot) HandleGetMsg() telebot.HandlerFunc {
 
 		// Отправляем сообщение назначенному менеджеру
 		managerChat := telebot.ChatID(managerID)
-		err = c.Send(managerChat, fmt.Sprintf("Новое сообщение от клиента %d: %s", clientID, c.Message().Text))
+		msg := fmt.Sprintf("Новое сообщение от клиента %d: %s", clientID, c.Message().Text)
+		_, err = b.client.Send(managerChat, msg)
 		if err != nil {
 			log.Println("Ошибка отправки сообщения менеджеру:", err)
 			return c.Send("Не удалось доставить сообщение менеджеру. Попробуйте позже.")
