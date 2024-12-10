@@ -6,21 +6,25 @@ ENV CGO_ENABLED=0
 
 RUN apk update --no-cache && apk add --no-cache tzdata
 
-WORKDIR /build
+WORKDIR /app/pkg
 
-ADD go.mod .
-ADD go.sum .
+COPY internal/pkg/ .
+
+WORKDIR /app/service/build
+
+COPY internal/services/req_manager_service/go.mod .
+COPY internal/services/req_manager_service/go.sum .
 RUN go mod download
-COPY . .
-RUN go build -ldflags="-s -w" -o app cmd/main.go
+
+COPY internal/services/req_manager_service .
+RUN go build -ldflags="-s -w" -o /app/req_manager_service ./cmd
+
 
 FROM scratch
 
+WORKDIR /app/req_manager_service
+
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-COPY --from=builder /usr/share/zoneinfo/Asia/Shanghai /usr/share/zoneinfo/Asia/Shanghai
-ENV TZ=Asia/Shanghai
+COPY --from=builder /app/req_manager_service /app/req_manager_service
 
-WORKDIR /app
-COPY --from=builder build/app app
-
-CMD ["./app"]
+CMD ["./req_manager_service"]
