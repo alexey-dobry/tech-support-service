@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -25,7 +26,7 @@ func GetActiveClientForManager(managerID int64) (int64, error) {
 	var response struct {
 		ClientID int64 `json:"client_id"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&response.ClientID); err != nil {
 		return 0, err
 	}
 
@@ -33,24 +34,19 @@ func GetActiveClientForManager(managerID int64) (int64, error) {
 }
 
 func GetAssignedManager(clientID int64) (int64, error) {
-	url := fmt.Sprintf("http://localhost:8070/sessions/%d", clientID)
+	url := fmt.Sprintf("http://localhost:8070/sessions/client/%d", clientID)
 
-	resp, err := http.Get(url)
-	if err != nil {
-		return 0, err
+	resp, _ := http.Get(url)
+	if resp.StatusCode != http.StatusOK {
+		return 0, nil
 	}
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return 0, fmt.Errorf("failed to get session: %s", string(body))
-	}
 
 	var response struct {
 		ManagerID int64 `json:"manager_id"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return 0, err
+	if err := json.NewDecoder(resp.Body).Decode(&response.ManagerID); err != nil {
+		return 0, nil
 	}
 
 	return response.ManagerID, nil
@@ -62,20 +58,23 @@ func AssignClientToManager(clientID int64) (int64, error) {
 
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(requestBody))
 	if err != nil {
+		log.Print("error1")
 		return 0, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
+		log.Print("error2")
 		return 0, fmt.Errorf("failed to assign manager: %s", string(body))
 	}
 
 	var response struct {
 		ManagerID int64 `json:"manager_id"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return 0, err
+	if err := json.NewDecoder(resp.Body).Decode(&response.ManagerID); err != nil {
+		log.Print("error3")
+		return 0, nil
 	}
 
 	return response.ManagerID, nil
@@ -86,6 +85,9 @@ func IsAuthorized(senderId int64) bool {
 
 	resp, err := http.Get(url)
 	if err != nil {
+		return false
+	}
+	if resp.StatusCode != http.StatusOK {
 		return false
 	}
 	defer resp.Body.Close()
@@ -110,7 +112,7 @@ func AddNewManager(managerID int64) error {
 	var response struct {
 		ManagerID int64 `json:"manager_id"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&response.ManagerID); err != nil {
 		return err
 	}
 
@@ -118,7 +120,7 @@ func AddNewManager(managerID int64) error {
 }
 
 func DeauthorizeManager(managerID int64) error {
-	url := fmt.Sprintf("http://localhost:8070/delete/:%d", managerID)
+	url := fmt.Sprintf("http://localhost:8070/delete/%d", managerID)
 	requestBody, _ := json.Marshal(map[string]int64{"manager_id": managerID})
 
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(requestBody))

@@ -11,8 +11,8 @@ func (s *Server) initRoutes() {
 	s.router.POST("/assign", s.handleAssingnManager())
 	s.router.POST("/end", s.handleFreeManager())
 	s.router.GET("/sessions/manager/:manager_id", s.handleGetManagerData())
-	s.router.GET("/sessions/manager/:client_id", s.handleGetClientData())
-	s.router.DELETE("/delete/:manager_id", s.handleEndSession())
+	s.router.GET("/sessions/client/:client_id", s.handleGetClientData())
+	s.router.POST("/delete/:manager_id", s.handleEndSession())
 
 	log.Print("server routes was initialized")
 }
