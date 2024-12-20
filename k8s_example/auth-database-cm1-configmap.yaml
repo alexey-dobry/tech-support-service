@@ -1,0 +1,18 @@
+apiVersion: v1
+data:
+  init.sql: |-
+    CREATE DATABASE IF NOT EXISTS managerdb;
+
+    USE managerdb;
+
+    CREATE TABLE IF NOT EXISTS managers (
+      username VARCHAR(50) NOT NULL PRIMARY KEY,
+      password VARCHAR(100) NOT NULL
+    );
+
+    INSERT INTO managers (username, password) VALUES ('alex_nh', 'qwertybird');
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: auth-database
+  name: auth-database-cm1

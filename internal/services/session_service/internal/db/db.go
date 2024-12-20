@@ -5,12 +5,12 @@ import (
 	"log"
 	"time"
 
-	"github.com/alexey-dobry/tech-support-platform/internal/services/auth_service/internal/config"
+	"github.com/alexey-dobry/tech-support-platform/internal/services/req_user_service/internal/config"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func NewMySQL(cfg *config.Config) (*sql.DB, error) {
-	dsn := "root:mypassword@tcp(localhost:3307)/managerdb"
+	dsn := "root:mypassword@tcp(localhost:3308)/sessiondb"
 
 	var db *sql.DB
 	var err error

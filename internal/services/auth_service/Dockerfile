@@ -8,7 +8,7 @@ RUN apk update --no-cache && apk add --no-cache tzdata
 
 WORKDIR /app/pkg
 
-COPY internal/pkg/ .
+COPY internal/pkg .
 
 WORKDIR /app/service/build
 
@@ -16,6 +16,7 @@ COPY internal/services/auth_service/go.mod .
 COPY internal/services/auth_service/go.sum .
 RUN go mod download
 
+COPY internal/services/auth_service/configs/config.toml ./config
 COPY internal/services/auth_service .
 RUN go build -ldflags="-s -w" -o /app/auth_service ./cmd
 

@@ -1,0 +1,19 @@
+apiVersion: v1
+data:
+  init.sql: |-
+    CREATE DATABASE IF NOT EXISTS sessiondb;
+
+    USE sessiondb;
+
+    CREATE TABLE IF NOT EXISTS sessions (
+      manager_id INT NOT NULL,
+      is_free BOOLEAN NOT NULL,
+      client_id INT NOT NULL
+    );
+
+    INSERT INTO sessions (manager_id, is_free, client_id) VALUES (549938415 ,1 ,0)
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: sessions-database
+  name: sessions-database-cm1

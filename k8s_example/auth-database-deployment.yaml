@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.34.0 (HEAD)
+  labels:
+    io.kompose.service: auth-database
+  name: auth-database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: auth-database
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yaml
+        kompose.version: 1.34.0 (HEAD)
+      labels:
+        io.kompose.service: auth-database
+    spec:
+      containers:
+        - env:
+            - name: MYSQL_DATABASE
+              value: managerdb
+            - name: MYSQL_PASSWORD
+              value: pass
+            - name: MYSQL_ROOT_PASSWORD
+              value: pass
+            - name: MYSQL_USER
+              value: myuser
+          image: mysql:9.1.0
+          name: authdb
+          ports:
+            - containerPort: 3306
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: auth
+            - mountPath: /docker-entrypoint-initdb.d
+              name: auth-database-cm1
+              readOnly: true
+      restartPolicy: Always
+      volumes:
+        - name: auth
+          persistentVolumeClaim:
+            claimName: auth
+        - configMap:
+            name: auth-database-cm1
+          name: auth-database-cm1

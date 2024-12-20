@@ -1,0 +1,49 @@
+version:'3'
+
+tasks:
+  start_services:
+    - task:run_auth
+    - task:run_req
+    - task:run_bot
+  
+  stop_services:
+    - task:stop_bot
+    - task:stop_auth
+    - task:stop_req
+
+  run_auth:
+    desc: run authentification service
+    cmds:
+      - cd ./internal/services/auth_service/cmd
+      - go run ./main.go
+
+  run_req:
+    desc: run authentification service
+    cmds:
+      - cd ./internal/services/req_manager_service/cmd
+      - go run ./main.go
+
+  run_bot:
+    desc: run authentification service
+    cmds:
+      - cd ./internal/services/manager_bot_service/cmd
+      - go run ./main.go
+  
+  stop_auth:
+    desc: run authentification service
+    cmds:
+      - pkill "go run main.go"
+
+  stop_req:
+    desc: run authentification service
+    cmds:
+      - pkill "go run main.go"
+
+  stop_bot:
+    desc: run authentification service
+    cmds:
+      - pkill "go run main.go"
+  
+  restart_servoces:
+    - task:start_services
+    - task:stop_services

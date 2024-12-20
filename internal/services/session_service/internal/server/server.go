@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/alexey-dobry/tech-support-platform/internal/services/auth_service/internal/config"
+	"github.com/alexey-dobry/tech-support-platform/internal/services/req_user_service/internal/config"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,5 +26,5 @@ func New(dataBase *sql.DB) *Server {
 }
 
 func (s *Server) Run(cfg *config.Config) {
-	log.Fatal(s.router.Run(":8080"))
+	log.Fatal(s.router.Run(":8070"))
 }

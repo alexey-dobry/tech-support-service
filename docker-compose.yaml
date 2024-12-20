@@ -1,0 +1,82 @@
+services:
+  admin:
+    image: phpmyadmin:5.2.1-apache
+    container_name: admin
+    ports:
+      - "8081:8081"
+    networks:
+      - app-network
+    environment:
+      PMA_HOST: db
+      PMA_USER: user
+      PMA_PASSWORD: 1234
+
+  auth-database:
+    image: mysql:9.1.0
+    container_name: authdb
+    ports:
+      - "3308:3306"
+    networks:
+      - app-network
+    environment:
+      MYSQL_DATABASE: managerdb
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_PASSWORD:  pass
+      MYSQL_USER: myuser
+    volumes:
+      - auth:/var/lib/mysql
+      - ./migrations/auth:/docker-entrypoint-initdb.d/:ro
+  
+  sessions-database:
+    image: mysql:9.1.0
+    container_name: sessiondb
+    ports:
+      - "3307:3306"
+    networks:
+      - app-network
+    environment:
+      MYSQL_DATABASE: sessiondb
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_PASSWORD:  pass
+      MYSQL_USER: myuser
+    volumes:
+      - session:/var/lib/mysql
+      - ./migrations/session:/docker-entrypoint-initdb.d/:ro
+
+  auth-service:
+    image: auth-service:latest
+    container_name: authentification-service
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    depends_on:
+      - auth-database
+
+  session-service:
+    image: session-service:latest
+    container_name: session-service
+    ports:
+      - "8070:8070"
+    networks:
+      - app-network
+    depends_on:
+      - sessions-database
+
+  bot-service:
+    image: bot-service:latest
+    container_name: bot-service
+    networks:
+      - app-network
+    ports:
+      - "8088:8088"
+    depends_on:
+      - auth-service
+      - session-service
+
+networks:
+  app-network:
+
+volumes:
+  auth:
+  session: 

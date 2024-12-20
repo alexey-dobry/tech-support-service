@@ -1,0 +1,4 @@
+[bot]
+tocken = "your-tocken"
+language = "ru-RU"
+url = "http://localhost:8080/auth"
