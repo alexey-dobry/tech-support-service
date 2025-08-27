@@ -1,5 +1,4 @@
-version:'3'
-
+version: "3"
 tasks:
   start_services:
     - task:run_auth
@@ -44,6 +43,6 @@ tasks:
     cmds:
       - pkill "go run main.go"
   
-  restart_servoces:
+  restart_services:
     - task:start_services
     - task:stop_services
